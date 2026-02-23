@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-gray-950 text-gray-100 font-sans;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(46, 87, 44, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(61, 110, 58, 0.05) 0%, transparent 50%);
+  }
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-military-600 rounded-full;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-xl p-5;
+  }
+  .card-header {
+    @apply flex items-center justify-between mb-4;
+  }
+  .btn-primary {
+    @apply bg-military-600 hover:bg-military-500 text-white font-medium px-4 py-2 rounded-lg 
+           transition-all duration-200 flex items-center gap-2 text-sm;
+  }
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium px-4 py-2 rounded-lg 
+           transition-all duration-200 flex items-center gap-2 text-sm border border-gray-700;
+  }
+  .btn-danger {
+    @apply bg-red-900 hover:bg-red-800 text-red-200 font-medium px-4 py-2 rounded-lg 
+           transition-all duration-200 flex items-center gap-2 text-sm;
+  }
+  .input {
+    @apply bg-gray-800 border border-gray-700 text-gray-100 text-sm rounded-lg 
+           focus:ring-2 focus:ring-military-500 focus:border-military-500 
+           block w-full p-2.5 placeholder-gray-500 transition-all duration-200;
+  }
+  .select {
+    @apply bg-gray-800 border border-gray-700 text-gray-100 text-sm rounded-lg 
+           focus:ring-2 focus:ring-military-500 focus:border-military-500 
+           block w-full p-2.5 transition-all duration-200;
+  }
+  .label {
+    @apply block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .table-header {
+    @apply text-left text-xs font-semibold text-gray-400 uppercase tracking-wider py-3 px-4;
+  }
+  .table-cell {
+    @apply py-3 px-4 text-sm text-gray-300;
+  }
+  .metric-card {
+    @apply card hover:border-military-700 transition-all duration-300 cursor-default;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-military-400 to-olive-400 bg-clip-text text-transparent;
+  }
+  .glow-green {
+    box-shadow: 0 0 20px rgba(61, 110, 58, 0.2);
+  }
+}

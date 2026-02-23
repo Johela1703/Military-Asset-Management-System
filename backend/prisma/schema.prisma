@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("LOGISTICS_OFFICER") // ADMIN | BASE_COMMANDER | LOGISTICS_OFFICER
+  baseId    String?
+  base      Base?    @relation(fields: [baseId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs   AuditLog[]
+  assignments Assignment[]
+}
+
+model Base {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  location    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users            User[]
+  purchases        Purchase[]
+  transfersOut     Transfer[]   @relation("SourceBase")
+  transfersIn      Transfer[]   @relation("DestinationBase")
+  assignments      Assignment[]
+  expenditures     Expenditure[]
+}
+
+model EquipmentType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  category    String   // vehicles, weapons, ammunition, etc.
+  unit        String   @default("unit") // unit of measure
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchases    Purchase[]
+  transfers    Transfer[]
+  assignments  Assignment[]
+  expenditures Expenditure[]
+}
+
+model Purchase {
+  id              String        @id @default(cuid())
+  baseId          String
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId String
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  unitCost        Float         @default(0)
+  totalCost       Float         @default(0)
+  supplier        String?
+  purchaseDate    DateTime      @default(now())
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model Transfer {
+  id              String        @id @default(cuid())
+  sourceBaseId    String
+  sourceBase      Base          @relation("SourceBase", fields: [sourceBaseId], references: [id])
+  destBaseId      String
+  destBase        Base          @relation("DestinationBase", fields: [destBaseId], references: [id])
+  equipmentTypeId String
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  transferDate    DateTime      @default(now())
+  status          String        @default("COMPLETED") // PENDING, COMPLETED, CANCELLED
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model Assignment {
+  id              String        @id @default(cuid())
+  baseId          String
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId String
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  assignedToId    String
+  assignedTo      User          @relation(fields: [assignedToId], references: [id])
+  personnelName   String
+  quantity        Int
+  assignedDate    DateTime      @default(now())
+  returnDate      DateTime?
+  status          String        @default("ACTIVE") // ACTIVE, RETURNED
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model Expenditure {
+  id              String        @id @default(cuid())
+  baseId          String
+  base            Base          @relation(fields: [baseId], references: [id])
+  equipmentTypeId String
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  reason          String
+  expendedDate    DateTime      @default(now())
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  action        String       // PURCHASE_CREATED, TRANSFER_CREATED, ASSIGNMENT_CREATED, etc.
+  entityType    String       // Purchase, Transfer, Assignment, Expenditure
+  entityId      String
+  description   String
+  metadata      String?      // JSON string for additional data
+  createdAt     DateTime     @default(now())
+
+  purchaseId     String?
+  purchase       Purchase?     @relation(fields: [purchaseId], references: [id])
+  transferId     String?
+  transfer       Transfer?     @relation(fields: [transferId], references: [id])
+  assignmentId   String?
+  assignment     Assignment?   @relation(fields: [assignmentId], references: [id])
+  expenditureId  String?
+  expenditure    Expenditure?  @relation(fields: [expenditureId], references: [id])
+}
